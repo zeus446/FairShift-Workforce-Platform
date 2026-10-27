@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#172923">
+<meta name="description" content="FairShift makes everyday work clearer, safer and fairer. A local-first SDG 8 workforce fairness prototype.">
+<title>FairShift — Decent work, every day</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app" class="app">
+  <!-- Header -->
+  <header class="header" role="banner">
+    <div class="header-left">
+      <button class="btn-icon" id="menuToggle" aria-label="Menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="24" height="24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <a class="app-title" href="#" data-i18n="appTitle">fairshift<span class="brand-caption">DECENT WORK, EVERY DAY</span></a>
+      <span class="badge sdg" data-i18n="sdg8">SDG 8</span>
+      <span class="badge demo-tag" data-i18n="generic.sample">SAMPLE DATA</span>
+    </div>
+    <div class="header-center">
+      <select id="scenarioSelect" aria-label="Select scenario" class="select">
+        <option value="construction" data-i18n="scenario.construction">Construction Site</option>
+        <option value="college" data-i18n="scenario.college">College Facilities</option>
+      </select>
+      <select id="langSelect" aria-label="Select language" class="select">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+        <option value="ta">தமிழ்</option>
+      </select>
+      <button class="btn-icon contrast-action" id="contrastButton" type="button" aria-label="Toggle high contrast" title="Toggle high contrast">◐</button>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-secondary" id="resetDemo" data-i18n="resetDemo">Reset Demo</button>
+      <button class="btn btn-primary" id="viewToggle" data-i18n="switchToEmployer">Employer View</button>
+    </div>
+  </header>
+
+  <!-- Side Navigation (mobile drawer) -->
+  <nav id="sideNav" class="sidenav" role="navigation" aria-label="Main navigation">
+    <button class="sidenav-close" id="closeNav" aria-label="Close menu">&times;</button>
+    <ul class="nav-list" role="list">
+      <li><a href="#worker" class="nav-link active" data-view="worker" data-i18n="nav.worker">Worker Dashboard</a></li>
+      <li><a href="#employer" class="nav-link" data-view="employer" data-i18n="nav.employer">Employer Dashboard</a></li>
+      <li><a href="#demo" class="nav-link" data-view="demo" data-i18n="nav.demo">Demo Script</a></li>
+    </ul>
+    <div class="nav-footer">
+      <label class="toggle" data-i18n="highContrast">
+        <input type="checkbox" id="highContrastToggle"> High Contrast
+      </label>
+    </div>
+  </nav>
+  <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+  <!-- Main Content -->
+  <main id="main" class="main" role="main">
+    <!-- WORKER VIEW -->
+    <section id="view-worker" class="view active" role="region" aria-label="Worker Dashboard">
+      <div class="card worker-profile">
+        <div class="worker-avatar" id="workerAvatar">👷</div>
+        <h2 id="workerName" data-i18n="selectWorker">Select a worker</h2>
+        <p class="worker-role" id="workerRole"></p>
+        <div class="worker-meta">
+          <span class="meta-item"><strong data-i18n="todayHours">Today:</strong> <span id="todayHours">0h</span></span>
+          <span class="meta-item"><strong data-i18n="weekHours">Week:</strong> <span id="weekHours">0h</span></span>
+        </div>
+        <label class="worker-picker-label" for="workerSelect" data-i18n="worker.select">Demo worker</label>
+        <select id="workerSelect" class="select worker-picker" aria-label="Select demo worker"></select>
+      </div>
+
+      <div class="card shift-check" id="shiftCheckCard">
+        <h3 data-i18n="shiftCheck.title">ShiftCheck</h3>
+        <div class="shift-status" id="shiftStatus">
+          <span class="status-badge" id="statusBadge" data-i18n="shiftCheck.offShift">Off Shift</span>
+          <div class="timer" id="shiftTimer" style="display:none">00:00:00</div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary btn-lg" id="checkInBtn" data-i18n="shiftCheck.checkIn">Check In</button>
+          <button class="btn btn-danger btn-lg" id="checkOutBtn" data-i18n="shiftCheck.checkOut" style="display:none">Check Out</button>
+        </div>
+        <div class="recent-shifts" id="recentShifts">
+          <h4 data-i18n="shiftCheck.recent">Recent Shifts</h4>
+          <ul id="shiftsList"></ul>
+        </div>
+      </div>
+
+      <div class="card fair-pay" id="fairPayCard">
+        <h3 data-i18n="fairPay.title">FairPay — Estimated Earnings</h3>
+        <div class="pay-breakdown">
+          <div class="pay-row"><span data-i18n="fairPay.baseHours">Regular Hours</span><span id="payBaseHours">0h</span></div>
+          <div class="pay-row"><span data-i18n="fairPay.otHours">Overtime Hours</span><span id="payOtHours">0h</span></div>
+          <div class="pay-row"><span data-i18n="fairPay.baseRate">Base Rate</span><span id="payBaseRate">₹0/hr</span></div>
+          <div class="pay-row"><span data-i18n="fairPay.regularPay">Regular wages</span><span id="payBaseWages">₹0</span></div>
+          <div class="pay-row"><span data-i18n="fairPay.overtimeRate">Overtime rate</span><span id="payOtRate">₹0/hr</span></div>
+          <div class="pay-row"><span data-i18n="fairPay.overtimePay">Overtime wages</span><span id="payOvertimePay">₹0</span></div>
+          <div class="pay-row"><span data-i18n="fairPay.allowances">Allowances</span><span id="payAllowances">₹0</span></div>
+          <div class="pay-row"><span data-i18n="fairPay.gross">Gross pay · before deductions</span><span id="payGross">₹0</span></div>
+          <div class="pay-row deduction"><span data-i18n="fairPay.deductions">Deductions (12%)</span><span id="payDeductions">₹0</span></div>
+          <div class="pay-row total"><strong data-i18n="fairPay.net">Net Pay</strong><strong id="payNet">₹0</strong></div>
+        </div>
+        <p class="pay-note" data-i18n="fairPay.note">Calculations update live from attendance. Overtime at 1.5× after 8h/day.</p>
+      </div>
+
+      <div class="card fatigue-guard" id="fatigueCard">
+        <h3 data-i18n="fatigue.title">FatigueGuard</h3>
+        <div id="fatigueAlerts" class="alerts"></div>
+        <div class="fatigue-rules" data-i18n="fatigue.rules">
+          <small>Rules: >12h/day • <11h rest • >60h/week • >6 consecutive days</small>
+        </div>
+      </div>
+
+      <div class="card safe-voice">
+        <h3 data-i18n="safeVoice.title">SafeVoice — Report Hazard</h3>
+        <form id="hazardForm" class="form">
+          <div class="form-row">
+            <label for="hazardType" data-i18n="safeVoice.type">Hazard Type</label>
+            <select id="hazardType" required></select>
+          </div>
+          <div class="form-row">
+            <label for="hazardSeverity" data-i18n="safeVoice.severity">Severity</label>
+            <select id="hazardSeverity" required><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select>
+          </div>
+          <div class="form-row">
+            <label for="hazardLocation" data-i18n="safeVoice.location">Location</label>
+            <input type="text" id="hazardLocation" placeholder="e.g., Building A, Floor 3" required>
+          </div>
+          <div class="form-row">
+            <label for="hazardDescription" data-i18n="safeVoice.description">Description</label>
+            <textarea id="hazardDescription" rows="3" placeholder="Describe the hazard..." required></textarea>
+          </div>
+          <div class="form-row checkbox-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="hazardAnonymous"> <span data-i18n="safeVoice.anonymous">Submit Anonymously</span>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary" data-i18n="safeVoice.submit">Submit Report</button>
+        </form>
+        <p class="privacy-note" data-i18n="safeVoice.privacy">Local demo only. Anonymous reports are not guaranteed to be anonymous.</p>
+        <div class="my-reports" id="myReports">
+          <h4 data-i18n="safeVoice.myReports">My Reports</h4>
+          <ul id="reportsList"></ul>
+        </div>
+      </div>
+
+      <div class="card skill-passport">
+        <h3 data-i18n="skillPassport.title">SkillPassport</h3>
+        <div class="skills-list" id="skillsList"></div>
+        <button class="btn btn-secondary" id="addSkillBtn" data-i18n="skillPassport.addSkill">Add Skill</button>
+        <button class="btn btn-outline" id="exportSkillsBtn" data-i18n="skillPassport.export">Export JSON</button>
+      </div>
+    </section>
+
+    <!-- EMPLOYER VIEW -->
+    <section id="view-employer" class="view" role="region" aria-label="Employer Dashboard">
+      <div class="dashboard-grid">
+        <div class="card metric-card">
+          <h3 data-i18n="pulse.present">Present now</h3>
+          <div class="metric-value" id="metricPresent">0</div>
+        </div>
+        <div class="card metric-card">
+          <h3 data-i18n="pulse.totalWorkers">Total Workers</h3>
+          <div class="metric-value" id="metricWorkers">0</div>
+        </div>
+        <div class="card metric-card warning">
+          <h3 data-i18n="pulse.unresolvedHazards">Unresolved Hazards</h3>
+          <div class="metric-value" id="metricUnresolved">0</div>
+        </div>
+        <div class="card metric-card">
+          <h3 data-i18n="pulse.avgOvertime">Overtime Hours (7d)</h3>
+          <div class="metric-value" id="metricOvertime">0%</div>
+        </div>
+        <div class="card metric-card danger">
+          <h3 data-i18n="pulse.fatigueAlerts">Fatigue Alerts</h3>
+          <div class="metric-value" id="metricFatigue">0</div>
+        </div>
+      </div>
+
+      <div class="employer-overview"><strong data-i18n="pulse.overviewTitle">Today's Fairness Pulse</strong><span id="scenarioSummary">Construction · SAMPLE DATA</span></div>
+
+      <div class="card incident-queue">
+        <h3 data-i18n="pulse.incidentQueue">Incident Queue</h3>
+        <div class="queue-toolbar">
+          <label class="sr-only" for="reportFilter" data-i18n="pulse.filterReports">Filter reports</label>
+          <select id="reportFilter" class="select"><option value="all" data-i18n="pulse.allReports">All reports</option><option value="Open" data-i18n="status.open">Open</option><option value="Acknowledged" data-i18n="status.acknowledged">Acknowledged</option><option value="Investigating" data-i18n="status.investigating">Investigating</option><option value="Resolved" data-i18n="status.resolved">Resolved</option></select>
+        </div>
+        <ul id="incidentList"></ul>
+      </div>
+
+      <div class="card fairness-pulse">
+        <h3 data-i18n="pulse.recommendations">Fairness Pulse · recommended actions</h3>
+        <ul id="pulseRecommendations"></ul>
+      </div>
+
+      <div class="card workforce-table">
+        <h3 data-i18n="pulse.workforce">Workforce attendance &amp; hours · sample data</h3>
+        <label class="sr-only" for="workerSearch" data-i18n="pulse.searchWorkers">Search workers or worksites</label>
+        <input id="workerSearch" class="select search-field" type="search" data-i18n-placeholder="pulse.searchWorkers" placeholder="Search workers">
+        <div class="table-wrap">
+          <table id="workforceTable">
+            <thead>
+              <tr>
+                <th data-i18n="pulse.colWorker">Worker</th>
+                <th data-i18n="pulse.colRole">Role</th>
+                <th data-i18n="pulse.colHoursWeek">Hours/Week</th>
+                <th data-i18n="pulse.colOvertime">OT %</th>
+                <th data-i18n="pulse.colFatigue">Fatigue</th>
+                <th data-i18n="pulse.colStatus">Status</th>
+              </tr>
+            </thead>
+            <tbody id="workforceBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEMO VIEW -->
+    <section id="view-demo" class="view" role="region" aria-label="Demo Script">
+      <div class="card demo-script">
+        <h2 data-i18n="demo.title">FairShift — 2-Minute Demo Script</h2>
+        <ol class="demo-steps">
+          <li><strong data-i18n="demo.step1.title">Switch Scenario:</strong> <span data-i18n="demo.step1.desc">Toggle between Construction and College Facilities — compare real seeded roles, shifts, and safety reports.</span></li>
+          <li><strong data-i18n="demo.step2.title">Worker Check-In:</strong> <span data-i18n="demo.step2.desc">Pick a worker, record a check-in and check-out, then see actual recorded hours update pay and safety checks.</span></li>
+          <li><strong data-i18n="demo.step3.title">FairPay Updates Live:</strong> <span data-i18n="demo.step3.desc">After 8h, overtime (1.5×) kicks in. Deductions 12%. Net pay calculates automatically.</span></li>
+          <li><strong data-i18n="demo.step4.title">FatigueGuard Alerts:</strong> <span data-i18n="demo.step4.desc">See clear rule-based explanations for shifts over 12h, rest under 11h, or more than 60h in a week.</span></li>
+          <li><strong data-i18n="demo.step5.title">SafeVoice Hazard Report:</strong> <span data-i18n="demo.step5.desc">Worker submits hazard (anonymous option) → appears in their list as "Submitted".</span></li>
+          <li><strong data-i18n="demo.step6.title">Employer Resolves:</strong> <span data-i18n="demo.step6.desc">Switch to Employer view, acknowledge or investigate a report, then resolve it and confirm the worker sees the new status.</span></li>
+          <li><strong data-i18n="demo.step7.title">Fairness Pulse:</strong> <span data-i18n="demo.step7.desc">Dashboard shows unresolved hazards, overtime %, fatigue alerts, workforce table with risk flags.</span></li>
+          <li><strong data-i18n="demo.step8.title">Language Switch:</strong> <span data-i18n="demo.step8.desc">EN / HI / TA — all strings swap instantly, persists across reloads.</span></li>
+          <li><strong data-i18n="demo.step9.title">Reset Demo:</strong> <span data-i18n="demo.step9.desc">One click restores clean seeded state for next demo.</span></li>
+        </ol>
+        <p class="demo-note" data-i18n="demo.note">All data stays in this browser. No backend or secure anonymity. Built for SDG 8: Decent Work & Economic Growth.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modals -->
+  <dialog id="skillModal" class="modal">
+    <form method="dialog" class="modal-content">
+      <h3 data-i18n="skillPassport.addSkill">Add Skill</h3>
+      <div class="form-row">
+        <label for="skillNameInput" data-i18n="skillPassport.skillName">Skill Name</label>
+        <input type="text" id="skillNameInput" required>
+      </div>
+      <div class="form-row">
+        <label for="skillDetailInput" data-i18n="skillPassport.skillDetail">Experience or training</label>
+        <input type="text" id="skillDetailInput" maxlength="100">
+      </div>
+      <div class="form-row">
+        <label data-i18n="skillPassport.skillLevel">Level</label>
+        <select id="skillLevelInput">
+          <option value="beginner" data-i18n="skillPassport.beginner">Beginner</option>
+          <option value="intermediate" data-i18n="skillPassport.intermediate">Intermediate</option>
+          <option value="advanced" data-i18n="skillPassport.advanced">Advanced</option>
+          <option value="expert" data-i18n="skillPassport.expert">Expert</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label data-i18n="skillPassport.certified">Certified?</label>
+        <input type="checkbox" id="skillCertifiedInput">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" value="cancel" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-primary" id="saveSkillBtn" value="default" data-i18n="save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirmModal" class="modal">
+    <div class="modal-content">
+      <h3 id="confirmTitle" data-i18n="confirm.resetTitle">Reset Demo Data?</h3>
+      <p id="confirmMsg" data-i18n="confirm.resetMsg">This will clear all attendance, hazards, and skills for the current scenario. Continue?</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="confirmCancel" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-danger" id="confirmOk" data-i18n="confirm.reset">Reset</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="resolveModal" class="modal">
+    <form method="dialog" class="modal-content">
+      <h3 data-i18n="pulse.resolveTitle">Resolve Incident</h3>
+      <div class="form-row">
+        <label data-i18n="pulse.resolutionNotes">Resolution Notes</label>
+        <textarea id="resolutionNotes" rows="3" minlength="5" maxlength="300" required placeholder="Action taken..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" value="cancel" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-primary" id="saveResolutionBtn" value="default" data-i18n="pulse.resolve">Resolve</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

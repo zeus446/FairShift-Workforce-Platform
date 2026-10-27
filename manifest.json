@@ -1,0 +1,9 @@
+{
+  "name": "FairShift — Decent work, every day",
+  "short_name": "FairShift",
+  "description": "A local-first workforce fairness demo aligned with UN SDG 8.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f7f8f4",
+  "theme_color": "#172923"
+}
